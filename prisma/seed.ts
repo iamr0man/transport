@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 async function main() {
 	// create two dummy articles
 	const transport1 = await prisma.transport.upsert({
-		where: { licensePlate: '777' },
+		where: { licensePlate: 'ABC123' },
 		update: {},
 		create: {
 			licensePlate: "ABC123",
@@ -23,7 +23,7 @@ async function main() {
 	});
 
 	const transport2 = await prisma.transport.upsert({
-		where: { licensePlate: "888" },
+		where: { licensePlate: "XYZ789" },
 		update: {},
 		create: {
 			licensePlate: "XYZ789",
@@ -38,7 +38,7 @@ async function main() {
 	console.log({ transport1, transport2 })
 
 	const route1 = await prisma.route.upsert({
-		where: { status: IRoutes.Enum.Status.COMPLETED },
+		where: { status: IRoutes.Enum.Status.PROCESSING },
 		update: {},
 		create: {
 			cityStart: "City A",
@@ -54,7 +54,7 @@ async function main() {
 	});
 
 	const route2 = await prisma.route.upsert({
-		where: { status: IRoutes.Enum.Status.COMPLETED },
+		where: { status: IRoutes.Enum.Status.PREPARING },
 		update: {},
 		create: {
 			cityStart: "City A",

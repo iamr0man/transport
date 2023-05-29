@@ -22,4 +22,6 @@ export namespace ITransports {
 		mileage: number | null
 		type: Enum.Type;
 	}
+
+	export type RawModel = Omit<Model, 'id'>
 }
