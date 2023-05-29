@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model route {
+  id                    Int            @id @default(autoincrement())
+  cityStart             String?        @db.VarChar
+  cityEnd               String?        @db.VarChar
+  distanceBetweenCities Int?
+  sendingDate           DateTime?      @db.Timestamp(6)
+  deliveryDate          DateTime?      @db.Timestamp(6)
+  transportType         transport_type
+  revenue               Int?
+  transportId           Int
+  status                route_status   @unique
+  transport             transport      @relation(fields: [transportId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model transport {
+  id           Int              @id @default(autoincrement())
+  licensePlate String?          @unique @db.VarChar
+  status       transport_status
+  model        String?          @db.VarChar
+  purchaseDate DateTime?        @db.Timestamp(6)
+  mileage      Int?
+  type         transport_type
+  route        route[]
+}
+
+enum route_status {
+  PREPARING
+  PROCESSING
+  COMPLETED
+}
+
+enum transport_status {
+  FREE
+  BUSY
+}
+
+enum transport_type {
+  TRUCK
+  SHIP
+  PLAN
+  TRAIN
+}
