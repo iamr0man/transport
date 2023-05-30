@@ -1,3 +1,5 @@
+import { IRoutes } from "@/core/routes/types/route.types";
+
 export namespace ITransports {
 	export namespace Enum {
 
@@ -24,4 +26,6 @@ export namespace ITransports {
 	}
 
 	export type RawModel = Omit<Model, 'id'>
+
+	export type ModelWithRoutes = Model & { route: IRoutes.Model[] }
 }

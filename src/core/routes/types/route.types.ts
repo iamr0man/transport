@@ -21,4 +21,6 @@ export namespace IRoutes {
 		revenue: number | null
 		transportId: number
 	}
+
+	export type RawModel = Omit<Model, 'id'>
 }

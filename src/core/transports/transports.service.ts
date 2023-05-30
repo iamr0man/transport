@@ -4,10 +4,7 @@ import { ITransports } from "@/core/transports/types/transport.types";
 
 @Injectable()
 export class TransportsService {
-  constructor(
-    // private routesService: RoutesService,
-    private _PrismaHelper: PrismaHelper,
-  ) {}
+  constructor(private _PrismaHelper: PrismaHelper) {}
 
   async findAll(): Promise<ITransports.Model[]> {
     const transports = await this._PrismaHelper.transport.findMany();
@@ -15,16 +12,19 @@ export class TransportsService {
     return transports as unknown as ITransports.Model[]
   }
 
-  async findById(id: number): Promise<ITransports.Model> {
+  async findById(id: number): Promise<ITransports.ModelWithRoutes> {
     const car = await this._PrismaHelper.transport.findUnique({
-      where: { id }
+      where: { id },
+      include: {
+        route: true
+      }
     });
 
     if (!car) {
       throw new BadRequestException('Transport not found');
     }
 
-    return car as unknown as ITransports.Model;
+    return car as unknown as ITransports.ModelWithRoutes;
   }
 
   async create(transportBody: ITransports.RawModel): Promise<ITransports.Model> {
@@ -35,7 +35,7 @@ export class TransportsService {
     return transport as unknown as ITransports.Model
   }
 
-  async update(id: number, updateTransport: Partial<ITransports.RawModel>): Promise<ITransports.Model> {
+  async update({ id, updateTransport }: { id: number,  updateTransport: Partial<ITransports.RawModel>}): Promise<ITransports.Model> {
     console.log(updateTransport);
 
     const transport = await this._PrismaHelper.transport.update({
@@ -47,14 +47,8 @@ export class TransportsService {
   }
 
   async delete(id: number): Promise<void> {
-    const transport = await this._PrismaHelper.transport.delete({
+    await this._PrismaHelper.transport.delete({
       where: { id }
     });
-
-    // if (transport.length > 0) {
-    //   throw new BadRequestException('Car cannot be deleted while it relate with routes');
-    // }
-    //
-    // await this.carRepository.delete(id);
   }
 }
