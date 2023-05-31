@@ -6,6 +6,7 @@ import { TransportsService } from "@/core/transports/transports.service";
 @Module({
   imports: [HelpersModule],
   controllers: [TransportsController],
-  providers: [TransportsService]
+  providers: [TransportsService],
+  exports: [TransportsService]
 })
 export class TransportsModule {}

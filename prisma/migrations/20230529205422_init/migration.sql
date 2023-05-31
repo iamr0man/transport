@@ -5,7 +5,7 @@ CREATE TYPE "route_status" AS ENUM ('PREPARING', 'PROCESSING', 'COMPLETED');
 CREATE TYPE "transport_status" AS ENUM ('FREE', 'BUSY');
 
 -- CreateEnum
-CREATE TYPE "transport_type" AS ENUM ('TRUCK', 'SHIP', 'PLAN', 'TRAIN');
+CREATE TYPE "transport_type" AS ENUM ('TRUCK', 'SHIP', 'PLANE', 'TRAIN');
 
 -- CreateTable
 CREATE TABLE "route" (

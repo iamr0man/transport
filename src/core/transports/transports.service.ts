@@ -6,8 +6,10 @@ import { ITransports } from "@/core/transports/types/transport.types";
 export class TransportsService {
   constructor(private _PrismaHelper: PrismaHelper) {}
 
-  async findAll(): Promise<ITransports.Model[]> {
-    const transports = await this._PrismaHelper.transport.findMany();
+  async findMany(query?: Partial<ITransports.RawModel>): Promise<ITransports.Model[]> {
+    const transports = await this._PrismaHelper.transport.findMany({
+      where: query,
+    });
 
     return transports as unknown as ITransports.Model[]
   }
@@ -36,8 +38,6 @@ export class TransportsService {
   }
 
   async update({ id, updateTransport }: { id: number,  updateTransport: Partial<ITransports.RawModel>}): Promise<ITransports.Model> {
-    console.log(updateTransport);
-
     const transport = await this._PrismaHelper.transport.update({
       where: { id },
       data: updateTransport

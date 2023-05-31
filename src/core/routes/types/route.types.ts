@@ -23,4 +23,6 @@ export namespace IRoutes {
 	}
 
 	export type RawModel = Omit<Model, 'id'>
+
+	export type ModelWithRelation = Model & { transport: ITransports.Model }
 }

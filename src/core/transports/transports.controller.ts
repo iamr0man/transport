@@ -1,7 +1,19 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, ParseIntPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  ParseIntPipe,
+  BadRequestException,
+  Query
+} from '@nestjs/common';
 import { TransportsService } from './transports.service';
 import { CreateTransportDto } from './dto/create-transport.dto';
 import { UpdateTransportDto } from './dto/update-transport.dto';
+import { ITransports } from "@/core/transports/types/transport.types";
 
 @Controller('transports')
 export class TransportsController {
@@ -13,8 +25,8 @@ export class TransportsController {
   }
 
   @Get()
-  findAll() {
-    return this._TransportsService.findAll();
+  findMany(@Query() query?: Partial<ITransports.RawModel>) {
+    return this._TransportsService.findMany(query);
   }
 
   @Get(':id')

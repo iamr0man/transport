@@ -7,144 +7,150 @@ import { TransportsService } from "@/core/transports/transports.service";
 @Injectable()
 export class RoutesService {
 
-  constructor(
-    private _PrismaHelper: PrismaHelper,
-    private _TransportsService: TransportsService
-  ) {}
-  private areDeliveryDatesTheSame(newRoute: IRoutes.RawModel, oldRoute: IRoutes.RawModel): boolean {
-    return (
-      new Date(oldRoute.deliveryDate).setHours(0, 0, 0, 0)
-      ===
-      new Date(newRoute.deliveryDate).setHours(0, 0, 0, 0)
-      ||
-      new Date(oldRoute.sendingDate).setHours(0, 0, 0, 0)
-      ===
-      new Date(newRoute.sendingDate).setHours(0, 0, 0, 0)
-    );
-  }
+	constructor(
+		private _PrismaHelper: PrismaHelper,
+		private _TransportsService: TransportsService
+	) {
+	}
 
-  private getCarStatus(route: IRoutes.RawModel): ITransports.Enum.Status {
-    const from = new Date(route.sendingDate).setHours(0, 0, 0, 0);
-    const to = new Date(route.deliveryDate).setHours(0, 0, 0, 0);
-    const now = new Date().setHours(0, 0, 0, 0);
+	private areDeliveryDatesTheSame(newRoute: IRoutes.RawModel, oldRoute: IRoutes.RawModel): boolean {
+		return (
+			new Date(oldRoute.deliveryDate).setHours(0, 0, 0, 0)
+			===
+			new Date(newRoute.deliveryDate).setHours(0, 0, 0, 0)
+			||
+			new Date(oldRoute.sendingDate).setHours(0, 0, 0, 0)
+			===
+			new Date(newRoute.sendingDate).setHours(0, 0, 0, 0)
+		);
+	}
 
-    const isNowDateBetweenDeliveryDates = now >= from && now <= to;
-    const isNowDateAfterDeliveryDates = now > to;
+	private getCarStatus(route: IRoutes.RawModel): ITransports.Enum.Status {
+		const from = new Date(route.sendingDate).setHours(0, 0, 0, 0);
+		const to = new Date(route.deliveryDate).setHours(0, 0, 0, 0);
+		const now = new Date().setHours(0, 0, 0, 0);
 
-    if ((route.status === IRoutes.Enum.Status.PROCESSING || route.status === IRoutes.Enum.Status.PREPARING) && isNowDateBetweenDeliveryDates) {
-      return ITransports.Enum.Status.BUSY;
-    } else if (route.status === IRoutes.Enum.Status.COMPLETED && (isNowDateAfterDeliveryDates || isNowDateBetweenDeliveryDates)) {
-      return ITransports.Enum.Status.FREE;
-    }
-  }
+		const isNowDateBetweenDeliveryDates = now >= from && now <= to;
+		const isNowDateAfterDeliveryDates = now > to;
 
-  private async checkCarAvailability(route: IRoutes.RawModel): Promise<void> {
-    const routes = await this._PrismaHelper.route.findMany({
-      where: {
-        transportId: route.transportId,
-        deliveryDate: {
-          gte: route.deliveryDate,
-        },
-        sendingDate: {
-          lte: route.sendingDate,
-        },
-      }
-    });
+		if ((route.status === IRoutes.Enum.Status.PROCESSING || route.status === IRoutes.Enum.Status.PREPARING) && isNowDateBetweenDeliveryDates) {
+			return ITransports.Enum.Status.BUSY;
+		} else if (route.status === IRoutes.Enum.Status.COMPLETED && (isNowDateAfterDeliveryDates || isNowDateBetweenDeliveryDates)) {
+			return ITransports.Enum.Status.FREE;
+		}
+	}
 
-    if (routes.length > 0) {
-      throw new BadRequestException('Car don`t available in this days');
-    }
-  }
+	private async checkCarAvailability(route: IRoutes.RawModel): Promise<void> {
+		const routes = await this._PrismaHelper.route.findMany({
+			where: {
+				transportId: route.transportId,
+				deliveryDate: {
+					gte: route.deliveryDate,
+				},
+				sendingDate: {
+					lte: route.sendingDate,
+				},
+			}
+		});
 
-  async findAll(): Promise<IRoutes.Model[]> {
-    const routes = await this._PrismaHelper.route.findMany();
+		if (routes.length > 0) {
+			throw new BadRequestException('Car don`t available in this days');
+		}
+	}
 
-    return routes as unknown as IRoutes.Model[]
-  }
+	async findAll(): Promise<IRoutes.Model[]> {
+		const routes = await this._PrismaHelper.route.findMany({
+			include: {
+				transport: true
+			}
+		});
 
-  async findRouteById(id: number): Promise<IRoutes.Model> {
-    const route = await this._PrismaHelper.route.findUnique({
-      where: { id },
-      include: {
-        transport: true
-      }
-    });
+		return routes as unknown as IRoutes.Model[]
+	}
 
-    if (!route) {
-      throw new BadRequestException('Route not found');
-    }
+	async findRouteById(id: number): Promise<IRoutes.ModelWithRelation> {
+		const route = await this._PrismaHelper.route.findUnique({
+			where: { id },
+			include: {
+				transport: true
+			}
+		});
 
-    return route as unknown as IRoutes.Model;
-  }
+		if (!route) {
+			throw new BadRequestException('Route not found');
+		}
 
-  async create(routeData: IRoutes.RawModel): Promise<IRoutes.Model> {
-    await this.checkCarAvailability(routeData);
+		return route as unknown as IRoutes.ModelWithRelation;
+	}
 
-    const status = await this.getCarStatus(routeData);
-    await this._TransportsService.update({
-      id: routeData.transportId,
-      updateTransport: {
-        status
-      }
-    })
+	async create(routeData: IRoutes.RawModel): Promise<IRoutes.Model> {
+		await this.checkCarAvailability(routeData);
 
-    const route = await this._PrismaHelper.route.create({
-      data: routeData
-    });
+		const status = await this.getCarStatus(routeData);
+		await this._TransportsService.update({
+			id: routeData.transportId,
+			updateTransport: {
+				status
+			}
+		})
 
-    return route as unknown as IRoutes.Model
-  }
+		const route = await this._PrismaHelper.route.create({
+			data: routeData
+		});
 
-  async update(id: number, newRouteData: Partial<IRoutes.RawModel>): Promise<IRoutes.Model> {
-    const newRoute = await this._PrismaHelper.route.update({
-      where: { id },
-      data: newRouteData,
-    })
+		return route as unknown as IRoutes.Model
+	}
 
-    return newRoute as unknown as IRoutes.Model
-  }
+	async update(id: number, newRouteData: Partial<IRoutes.RawModel>): Promise<IRoutes.Model> {
+		const newRoute = await this._PrismaHelper.route.update({
+			where: {id},
+			data: newRouteData,
+		})
 
-  async updateRelation(oldRoute: IRoutes.Model, newRoute: IRoutes.Model): Promise<void> {
-    if (!this.areDeliveryDatesTheSame(newRoute, oldRoute)) {
-      await this.checkCarAvailability(newRoute);
-    }
+		return newRoute as unknown as IRoutes.Model
+	}
 
-    if (oldRoute.transportId !== newRoute.transportId) {
-      const status = this.getCarStatus(oldRoute)
-      await this._TransportsService.update({
-        id: oldRoute.transportId,
-        updateTransport: {
-          status
-        }
-      })
-    }
+	async updateRelation(oldRoute: IRoutes.Model, newRoute: IRoutes.Model): Promise<void> {
+		if (!this.areDeliveryDatesTheSame(newRoute, oldRoute)) {
+			await this.checkCarAvailability(newRoute);
+		}
+		if (oldRoute.transportId !== newRoute.transportId) {
+			const status = this.getCarStatus(oldRoute);
 
-    const status = this.getCarStatus(newRoute);
-    await this._TransportsService.update({
-      id: newRoute.transportId,
-      updateTransport: {
-        status
-      }
-    })
-  }
+			await this._TransportsService.update({
+				id: oldRoute.transportId,
+				updateTransport: {
+					status
+				}
+			})
+		}
 
-  async delete(id: number): Promise<IRoutes.Model> {
-    const route = await this.findRouteById(id);
+		const status = this.getCarStatus(newRoute);
+		await this._TransportsService.update({
+			id: newRoute.transportId,
+			updateTransport: {
+				status
+			}
+		})
+	}
 
-    const transportStatus = this.getCarStatus(route);
+	async delete(id: number): Promise<IRoutes.Model> {
+		const route = await this.findRouteById(id);
 
-    const [deletedRoute] = await this._PrismaHelper.$transaction([
-      this._PrismaHelper.route.delete({
-        where: { id: route.id }
-      }),
-      this._PrismaHelper.transport.update({
-        where: { id: route.transportId },
-        data: {
-          status: transportStatus
-        }
-      }),
-    ]);
+		const transportStatus = this.getCarStatus(route);
 
-    return deletedRoute as unknown as IRoutes.Model;
-  }
+		const [deletedRoute] = await this._PrismaHelper.$transaction([
+			this._PrismaHelper.route.delete({
+				where: {id: route.id}
+			}),
+			this._PrismaHelper.transport.update({
+				where: {id: route.transportId},
+				data: {
+					status: transportStatus
+				}
+			}),
+		]);
+
+		return deletedRoute as unknown as IRoutes.Model;
+	}
 }

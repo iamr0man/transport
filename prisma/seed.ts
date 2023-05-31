@@ -8,7 +8,6 @@ import { IRoutes } from "../src/core/routes/types/route.types";
 const prisma = new PrismaClient();
 
 async function main() {
-	// create two dummy articles
 	const transport1 = await prisma.transport.upsert({
 		where: { licensePlate: 'ABC123' },
 		update: {},
@@ -31,7 +30,7 @@ async function main() {
 			model: "Car B",
 			purchaseDate: new Date("2021-06-15"),
 			mileage: 5000,
-			type: ITransports.Enum.Type.PLAN,
+			type: ITransports.Enum.Type.PLANE,
 		},
 	});
 
@@ -46,9 +45,9 @@ async function main() {
 			distanceBetweenCities: 200,
 			sendingDate: new Date("2023-04-31"),
 			deliveryDate: new Date("2023-05-31"),
-			transportType: ITransports.Enum.Type.PLAN,
+			transportType: ITransports.Enum.Type.TRUCK,
 			revenue: 1000,
-			transportId: transport2.id,
+			transportId: transport1.id,
 			status: IRoutes.Enum.Status.PROCESSING
 		},
 	});
@@ -62,9 +61,9 @@ async function main() {
 			distanceBetweenCities: 200,
 			sendingDate: new Date("2023-05-31"),
 			deliveryDate: new Date("2023-06-31"),
-			transportType: ITransports.Enum.Type.PLAN,
+			transportType: ITransports.Enum.Type.TRUCK,
 			revenue: 1000,
-			transportId: transport2.id,
+			transportId: transport1.id,
 			status: IRoutes.Enum.Status.PREPARING
 		},
 	});

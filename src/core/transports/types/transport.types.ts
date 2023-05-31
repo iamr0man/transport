@@ -9,7 +9,7 @@ export namespace ITransports {
 		}
 		export enum Type {
 			TRUCK = 'TRUCK',
-			PLAN = 'PLAN',
+			PLANE = 'PLANE',
 			TRAIN = 'TRAIN',
 			SHIP = 'SHIP',
 		}

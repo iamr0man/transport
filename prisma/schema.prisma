@@ -17,7 +17,7 @@ model route {
   transportType         transport_type
   revenue               Int?
   transportId           Int
-  status                route_status   @unique
+  status                route_status
   transport             transport      @relation(fields: [transportId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -46,6 +46,6 @@ enum transport_status {
 enum transport_type {
   TRUCK
   SHIP
-  PLAN
+  PLANE
   TRAIN
 }
