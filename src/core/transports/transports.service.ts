@@ -11,7 +11,7 @@ export class TransportsService {
       where: query,
     });
 
-    return transports as unknown as ITransports.Model[]
+    return transports as ITransports.Model[]
   }
 
   async findById(id: number): Promise<ITransports.ModelWithRoutes> {
@@ -26,7 +26,7 @@ export class TransportsService {
       throw new BadRequestException('Transport not found');
     }
 
-    return car as unknown as ITransports.ModelWithRoutes;
+    return car as ITransports.ModelWithRoutes;
   }
 
   async create(transportBody: ITransports.RawModel): Promise<ITransports.Model> {
@@ -34,7 +34,7 @@ export class TransportsService {
       data: transportBody
     });
 
-    return transport as unknown as ITransports.Model
+    return transport as ITransports.Model
   }
 
   async update({ id, updateTransport }: { id: number,  updateTransport: Partial<ITransports.RawModel>}): Promise<ITransports.Model> {
@@ -43,7 +43,7 @@ export class TransportsService {
       data: updateTransport
     });
 
-    return transport as unknown as ITransports.Model;
+    return transport as ITransports.Model;
   }
 
   async delete(id: number): Promise<void> {

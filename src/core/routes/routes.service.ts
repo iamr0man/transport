@@ -65,7 +65,7 @@ export class RoutesService {
 			}
 		});
 
-		return routes as unknown as IRoutes.Model[]
+		return routes as IRoutes.Model[]
 	}
 
 	async findRouteById(id: number): Promise<IRoutes.ModelWithRelation> {
@@ -80,7 +80,7 @@ export class RoutesService {
 			throw new BadRequestException('Route not found');
 		}
 
-		return route as unknown as IRoutes.ModelWithRelation;
+		return route as IRoutes.ModelWithRelation;
 	}
 
 	async create(routeData: IRoutes.RawModel): Promise<IRoutes.Model> {
@@ -98,7 +98,7 @@ export class RoutesService {
 			data: routeData
 		});
 
-		return route as unknown as IRoutes.Model
+		return route as IRoutes.Model
 	}
 
 	async update(id: number, newRouteData: Partial<IRoutes.RawModel>): Promise<IRoutes.Model> {
@@ -107,7 +107,7 @@ export class RoutesService {
 			data: newRouteData,
 		})
 
-		return newRoute as unknown as IRoutes.Model
+		return newRoute as IRoutes.Model
 	}
 
 	async updateRelation(oldRoute: IRoutes.Model, newRoute: IRoutes.Model): Promise<void> {
@@ -151,6 +151,6 @@ export class RoutesService {
 			}),
 		]);
 
-		return deletedRoute as unknown as IRoutes.Model;
+		return deletedRoute as IRoutes.Model;
 	}
 }
