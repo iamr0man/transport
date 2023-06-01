@@ -37,7 +37,7 @@ async function main() {
 	console.log({ transport1, transport2 })
 
 	const route1 = await prisma.route.upsert({
-		where: { status: IRoutes.Enum.Status.PROCESSING },
+		where: { id: 1 },
 		update: {},
 		create: {
 			cityStart: "City A",
@@ -53,7 +53,7 @@ async function main() {
 	});
 
 	const route2 = await prisma.route.upsert({
-		where: { status: IRoutes.Enum.Status.PREPARING },
+		where: { id: 2 },
 		update: {},
 		create: {
 			cityStart: "City A",

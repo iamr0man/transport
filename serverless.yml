@@ -1,0 +1,37 @@
+service: serverless-nest-example
+
+frameworkVersion: "3"
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-tscpaths
+  - serverless-plugin-optimize
+  - serverless-offline
+  - serverless-dotenv-plugin
+  # - serverless-plugin-warmup
+
+# custom:
+#   # Enable warmup on all functions (only for production and staging)
+#   warmup:
+#       - production
+#       - staging
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+package:
+  individually: true
+  patterns:
+    - '!node_modules/.prisma/client/libquery_engine-*'
+    - 'node_modules/.prisma/client/libquery_engine-rhel-*'
+    - '!node_modules/prisma/libquery_engine-*'
+    - '!node_modules/@prisma/engines/**'
+
+functions:
+  main:
+    handler: src/lambda.handler
+    events:
+      - http:
+          method: any
+          path: /{proxy+}
